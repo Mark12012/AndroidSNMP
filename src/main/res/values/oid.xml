@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="oid_1_3_6_1_2_1_7">
+        <item>.1 system</item>
+        <item>.2 interfaces</item>
+        <item>.3 at</item>
+        <item>.4 ip</item>
+        <item>.5 icmp</item>
+        <item>.6 tcp</item>
+        <item>.7 udp</item>
+        <item>.8 egp</item>
+    </string-array>
+</resources>
