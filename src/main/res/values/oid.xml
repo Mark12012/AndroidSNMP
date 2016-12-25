@@ -10,4 +10,14 @@
         <item>.7 udp</item>
         <item>.8 egp</item>
     </string-array>
+
+    <string-array name="oid_1_3_6_1_2_1__1">
+        <item>.1.0 sysDescr</item>
+        <item>.2.0 sysObjectID</item>
+        <item>.3.0 sysUpTime</item>
+        <item>.4.0 sysContact</item>
+        <item>.5.0 sysName</item>
+        <item>.6.0 sysLocation</item>
+        <item>.7.0 sysServices</item>
+    </string-array>
 </resources>

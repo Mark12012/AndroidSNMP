@@ -1,6 +1,5 @@
 package com.example.marek.zst3;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setSupportActionBar(toolbar);
 
         //R.id.spinner2.
-        Spinner spinner = (Spinner) findViewById(R.id.spinner2);
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerMainSelector);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.oid_1_3_6_1_2_1_7, android.R.layout.simple_spinner_item);
 
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Searching for OID.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
-        parent.setAdapter(null);
+        //parent.setAdapter(null);
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
