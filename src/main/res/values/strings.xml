@@ -1,4 +1,23 @@
 <resources>
     <string name="app_name">ZST3</string>
     <string name="action_settings">Settings</string>
+
+    <string name="pref_title_connection">Connection to Server</string>
+    <string name="pref_title_server_ip_address">Server Address</string>
+    <string name="pref_title_server_port">Server Port</string>
+
+    <string name="pref_summary_server_ip_address">Help server address</string>
+    <string name="pref_summary_server_port">Help server port</string>
+
+    <string name="pref_title_snmp_connection">SNMP Connection</string>
+    <string name="pref_title_snmp_machine_ip_address">SNMP Address</string>
+    <string name="pref_title_snmp_port">SNMP Port</string>
+    <string name="pref_title_read_community">Read Community</string>
+    <string name="pref_title_snmp_version">SNMP Version</string>
+
+    <string name="pref_summary_snmp_connection">Connection</string>
+    <string name="pref_summary_snmp_machine_ip_address">Help Address</string>
+    <string name="pref_summary_snmp_port">Help Port</string>
+    <string name="pref_summary_read_community">Help Readcommunity</string>
+    <string name="pref_summary_snmp_version">Help SNMP version</string>
 </resources>

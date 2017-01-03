@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_title_connection"
+        android:key="pref_key_server_connection_settings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <EditTextPreference
+            android:key="pref_key_connection_address"
+            android:dependency="pref_key_server_connection_settings"
+            android:summary="@string/pref_summary_server_ip_address"
+            android:title="@string/pref_title_server_ip_address"
+            android:defaultValue="192.168.1.2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditTextPreference
+            android:key="pref_key_connection_port"
+            android:dependency="pref_key_server_connection_settings"
+            android:summary="@string/pref_summary_server_port"
+            android:title="@string/pref_title_server_port"
+            android:defaultValue="6668"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_title_snmp_connection"
+        android:key="pref_key_snmp_connection_settings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <EditTextPreference
+            android:key="pref_key_snmp_connection_address"
+            android:summary="@string/pref_summary_snmp_machine_ip_address"
+            android:title="@string/pref_title_snmp_machine_ip_address"
+            android:defaultValue="127.0.0.1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditTextPreference
+            android:key="pref_key_snmp_connection_port"
+            android:dependency="pref_key_snmp_connection_settings"
+            android:summary="@string/pref_summary_snmp_port"
+            android:title="@string/pref_title_snmp_port"
+            android:defaultValue="161"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditTextPreference
+            android:key="pref_key_connection_community"
+            android:dependency="pref_key_snmp_connection_settings"
+            android:summary="@string/pref_summary_read_community"
+            android:title="@string/pref_title_read_community"
+            android:defaultValue="snmpClient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <EditTextPreference
+            android:key="pref_key_snmp_version"
+            android:dependency="pref_key_snmp_connection_settings"
+            android:summary="@string/pref_summary_snmp_version"
+            android:title="@string/pref_title_snmp_version"
+            android:defaultValue="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </PreferenceCategory>
+</PreferenceScreen>
