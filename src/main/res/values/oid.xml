@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="oid_1_3_6_1_2_1_7">
-        <item>.1 system</item>
-        <item>.2 interfaces</item>
-        <item>.3 at</item>
-        <item>.4 ip</item>
-        <item>.5 icmp</item>
-        <item>.6 tcp</item>
-        <item>.7 udp</item>
-        <item>.8 egp</item>
-    </string-array>
+    <string name = "o3">.1.3.6.1.2.1.1.1.0</string>
+    <string name = "o4">.1.3.6.1.2.1.1.2.0</string>
+    <string name = "o5">.1.3.6.1.2.1.1.3.0</string>
+    <string name = "o6">.1.3.6.1.2.1.1.4.0</string>
+    <string name = "o7">.1.3.6.1.2.1.1.5.0</string>
+    <string name = "o8">.1.3.6.1.2.1.1.6.0</string>
+    <string name = "o9">.1.3.6.1.2.1.1.7.0</string>
 
-    <string-array name="oid_1_3_6_1_2_1__1">
-        <item>.1.0 sysDescr</item>
-        <item>.2.0 sysObjectID</item>
-        <item>.3.0 sysUpTime</item>
-        <item>.4.0 sysContact</item>
-        <item>.5.0 sysName</item>
-        <item>.6.0 sysLocation</item>
-        <item>.7.0 sysServices</item>
-    </string-array>
+    <string name = "o11">.1.3.6.1.2.1.2.1.0</string>
+    <string name = "o12">.1.3.6.1.2.1.2.2</string>
+
+    <string name = "o1">.1.3.6.1.2.1.1.1.0</string>
 </resources>
