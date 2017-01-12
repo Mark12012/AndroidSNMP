@@ -53,17 +53,25 @@
     </string-array>
 
     <string-array name="pref_font_size">
-    <item>12 dp</item>
-    <item>16 dp</item>
-    <item>20 dp</item>
-    <item>24 dp</item>
-    <item>28 dp</item>
+        <item>12 dp</item>
+        <item>14 dp</item>
+        <item>16 dp</item>
+        <item>18 dp</item>
+        <item>20 dp</item>
+        <item>22 dp</item>
+        <item>24 dp</item>
+        <item>26 dp</item>
+        <item>28 dp</item>
 </string-array>
     <string-array name="pref_font_size_values">
         <item>12</item>
+        <item>14</item>
         <item>16</item>
+        <item>18</item>
         <item>20</item>
+        <item>22</item>
         <item>24</item>
+        <item>26</item>
         <item>28</item>
     </string-array>
 

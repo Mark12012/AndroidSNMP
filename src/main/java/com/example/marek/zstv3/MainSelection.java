@@ -39,8 +39,10 @@ public class MainSelection extends AppCompatActivity
     private ActionBarDrawerToggle toggle;
     private DrawerLayout drawer;
     private TextView textTitle;
+    private TextView textContent;
     private String currentName;
     private String currentOid;
+    private int currentIndex;
     private SharedPreferences sharedPrefs;
 
     @Override
@@ -49,7 +51,28 @@ public class MainSelection extends AppCompatActivity
         setContentView(R.layout.activity_main_selection);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        textTitle = (TextView) findViewById(R.id.textView2);
+        textContent = (TextView) findViewById(R.id.textContent);
+        expandableList = (ExpandableListView) findViewById(R.id.expandableList);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        prepareListData();
+        ListAdapter mAdapter = new ListAdapter(this, listFolders, listChild);
+        expandableList.setAdapter(mAdapter);
+
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        ///LISTENERY
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,17 +81,6 @@ public class MainSelection extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-
-        textTitle = (TextView) findViewById(R.id.textView2);
-
-        expandableList = (ExpandableListView) findViewById(R.id.expandableList);
-
-        prepareListData();
-
-        ListAdapter mAdapter = new ListAdapter(this, listFolders, listChild);
-
-        // setting list adapter
-        expandableList.setAdapter(mAdapter);
 
         expandableList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
 
@@ -82,22 +94,26 @@ public class MainSelection extends AppCompatActivity
             }
         });
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,int groupPosition, int childPosition, long id) {
+                //monitoringStop();
                 String name = listChild.get(listFolders.get(groupPosition)).get(childPosition);
                 String oid = getResources().getString(getResources().getIdentifier(name,"string",getPackageName()));
 
+                /*
+                * Próba zrobienia selection na Expandable list
+                * */
+                //parent.childsetBackgroundResource(android.R.color.transparent);
+                //currentIndex = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
+//                for(int i = 0; i < parent.getCount(); i++)
+//                parent.getChildAt(i).setBackgroundResource(android.R.color.transparent);
+//                parent.getChildAt(parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition))).setBackgroundResource(R.color.colorAccent);
+
+                /*
+                * AsyncTask do wysyłania do serwera
+                * */
 //                new AsyncTask<Void,Void,Void>(){
 //
 //                    @Override
@@ -131,11 +147,14 @@ public class MainSelection extends AppCompatActivity
                     //If monitoring is turned on start thread to monitor change
                     Snackbar.make(v, name + " - " + oid + " true", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+
                 }
 
                 return false;
             }
         });
+
+
     }
 
     @Override
@@ -183,6 +202,7 @@ public class MainSelection extends AppCompatActivity
         return true;
     }
 
+    ///Kod Michała
     private void prepareListData() {
         listFolders = new ArrayList<>();
         listChild = new HashMap<>();
@@ -214,6 +234,5 @@ public class MainSelection extends AppCompatActivity
         listChild.put(listFolders.get(5), udp);
         listChild.put(listFolders.get(6), snmp);
         listChild.put(listFolders.get(7), host);
-
     }
 }

@@ -8,7 +8,6 @@ android:background="#ffffffff"
 android:gravity="start"
 android:layoutDirection="ltr">
 
-
 <TextView
     android:id="@+id/lblListHeader"
     android:layout_width="fill_parent"

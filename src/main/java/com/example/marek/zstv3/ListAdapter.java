@@ -17,8 +17,8 @@ import java.util.List;
 public class ListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<String> listFolders; // lista z folderami
-    private HashMap<String, List<String>> listChild; //zawartosc folderow
+    private List<String> listFolders;
+    private HashMap<String, List<String>> listChild;
 
     public ListAdapter(Context context, List<String> listFolders,
                        HashMap<String, List<String>> listChild) {
@@ -87,6 +87,7 @@ public class ListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
+
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

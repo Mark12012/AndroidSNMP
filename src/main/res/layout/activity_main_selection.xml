@@ -27,6 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/expandableList"
+            android:choiceMode="singleChoice"
+            android:listSelector="@drawable/selector_list_item"
             android:paddingTop="90dp"
             style="@android:style/Widget.DeviceDefault.ExpandableListView"
             android:layoutDirection="rtl"
