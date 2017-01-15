@@ -21,8 +21,14 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +50,7 @@ public class MainSelection extends AppCompatActivity
     private String currentOid;
     private int currentIndex;
     private SharedPreferences sharedPrefs;
+    private Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +86,29 @@ public class MainSelection extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "GetNext on: " + currentName, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                try {
+//                    EditText et = (EditText) findViewById(R.id.EditText01);
+//                    String str = et.getText().toString();
+//                    PrintWriter out = new PrintWriter(new BufferedWriter(
+//                    new OutputStreamWriter(socket.getOutputStream())),
+//                    true);
+
+                    new Thread(new ClientThread()).start();
+                    RequestModel request = new RequestModel(Header.SYSTEM, "127.0.0.1", "community_read", SystemField.UP_TIME, TableType.TCP_CONN);
+                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                    out.flush();
+                    out.writeObject(request);
+                    out.close();
+                    socket.close();
+
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -234,5 +264,27 @@ public class MainSelection extends AppCompatActivity
         listChild.put(listFolders.get(5), udp);
         listChild.put(listFolders.get(6), snmp);
         listChild.put(listFolders.get(7), host);
+    }
+
+    //wątek z socketem
+    class ClientThread implements Runnable
+    {
+        public void run()
+        {
+            //TODO odczyt IP z ustawien
+            String hostname = "192.168.0.20";
+            try {
+                InetAddress address = InetAddress.getByName(hostname);
+                socket = new Socket(address, 6668);
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 }
