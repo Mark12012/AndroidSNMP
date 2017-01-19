@@ -129,8 +129,8 @@
     </string-array>
     <string-array
         name="Host">
-        <item>hrSystem</item>
         <item>hrSystemUptime</item>
         <item>hrSystemDate</item>
+        <item>hrSystemInitialLoadDevice</item>
     </string-array>
 </resources>

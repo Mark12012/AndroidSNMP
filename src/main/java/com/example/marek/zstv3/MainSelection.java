@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -39,8 +41,8 @@ import java.util.List;
 public class MainSelection extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    List<String> listFolders;
-    HashMap<String, List<String>> listChild;
+    private List<String> listFolders;
+    private HashMap<String, List<String>> listChild;
     private int lastExpandedPosition = -1;
     private ExpandableListView expandableList;
     private ActionBarDrawerToggle toggle;
@@ -53,6 +55,8 @@ public class MainSelection extends AppCompatActivity
     private SharedPreferences sharedPrefs;
     private Socket socket;
     public Connection connection;
+    public static boolean isFirst = true;
+    public static boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,25 +87,69 @@ public class MainSelection extends AppCompatActivity
 
         ///LISTENERY
 
+        findViewById(R.id.content_main_selection).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                new Thread(new Monitor()).run();
+                return false;
+            }
+        });
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "GetNext on: " + currentName, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 StringCreator sc = new StringCreator();
+
                 if(currentOid == null)
-                    currentOid = "1.3.6.1.2.1.1.1";
-                connection.sendMessage(sc.createQuerry("GETNEXT", currentOid, sharedPrefs));
+                    currentOid = "1.3.6.1.2.1.1";
+                else if(currentOid.contains("1.3.6.1.2.1.25.1.3"))
+                    return;
+                if(connected)
+                    connection.sendMessage(sc.createQuerry("GETNEXT", currentOid, sharedPrefs));
+                else
+                {
+                    prepareConnection();
+                    return;
+                }
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(100);
+                    if(isFirst)
+                        Thread.sleep(1000);
+                    if(currentOid.contains("1.3.6.1.2.1.2.2"))
+                        Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //String[] response = connection.getRecieveMessage().split("/");
-                //currentOid = response[0];
-                textContent.setText(connection.getRecieveMessage());
 
+                String[] response = connection.getRecieveMessage().split("%");
+                if(response.length == 2)
+                {
+                    currentOid = response[0];
+                    String tempName = "o" + currentOid.substring(0, currentOid.length() - 2);
+                    if(currentOid.contains("1.3.6.1.2.1.2.2"))
+                        textTitle.setText(getResources().getString(getResources().getIdentifier("o1.3.6.1.2.1.2.2","string",getPackageName())));
+                    else
+                        textTitle.setText(getResources().getString(getResources().getIdentifier(tempName,"string",getPackageName())));
+                    textContent.setText(response[1]);
+                }
+                else
+                {
+                    if(response.length == 1)
+                    {
+                        currentOid = response[0];
+                        String tempName = "o" + currentOid.substring(0, currentOid.length() - 2);
+                        Log.i("TEMP OID: ", tempName);
+                        if(currentOid.contains("1.3.6.1.2.1.2.2"))
+                            textTitle.setText(getResources().getString(getResources().getIdentifier("o1.3.6.1.2.1.2.2","string",getPackageName())));
+                        else
+                            textTitle.setText(getResources().getString(getResources().getIdentifier(tempName,"string",getPackageName())));
+                    }
+
+                    textContent.setText("");
+                }
+                Log.i("Current OID: ", currentOid);
+                isFirst = false;
             }
         });
 
@@ -125,22 +173,43 @@ public class MainSelection extends AppCompatActivity
                 String name = listChild.get(listFolders.get(groupPosition)).get(childPosition);
                 String oid = getResources().getString(getResources().getIdentifier(name,"string",getPackageName()));
                 currentOid = oid;
-
+                String[] response = null;
                 StringCreator sc = new StringCreator();
-                connection.sendMessage(sc.createQuerry("GET", currentOid, sharedPrefs));
+                if(connected)
+                    connection.sendMessage(sc.createQuerry("GET", currentOid, sharedPrefs));
+                else
+                {
+                    prepareConnection();
+                    return false;
+                }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
+                    if(isFirst)
+                        Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //String[] response = connection.getRecieveMessage().split("/");
-//                if(!(currentOid + ".0").equals(response[0]))
-//                {
-//                    currentOid = response[0];
-//                    textTitle.setText(currentOid);
-//                }
+                if(connected)
+                    response = connection.getRecieveMessage().split("%");
+                else
+                {
+                    response[0] = null;
+                    response[1] = "NOT CONNECTED";
+                }
 
-                textContent.setText(connection.getRecieveMessage());
+                if(response.length == 2)
+                {
+                    currentOid = response[0];
+                    textContent.setText(response[1]);
+                }
+                else
+                {
+                    if(response.length == 1)
+                    {
+                        currentOid = response[0];
+                    }
+                    textContent.setText("");
+                }
 
                 currentName = name;
                 currentOid = oid;
@@ -153,26 +222,15 @@ public class MainSelection extends AppCompatActivity
                     Snackbar.make(v, name + " - " + oid + " true", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                }
 
+                }
+                Log.i("Current OID: ", currentOid);
+                isFirst = false;
                 return false;
             }
         });
 
 
-    }
-
-    @SuppressWarnings("unchecked")
-
-    protected void onProgressUpdate(String item) {
-        setContentText(item);
-    }
-
-
-    protected void onPostExecute(Void unused) {
-        Toast
-                .makeText(MainSelection.this, "Done!", Toast.LENGTH_SHORT)
-                .show();
     }
 
     @Override
@@ -220,11 +278,6 @@ public class MainSelection extends AppCompatActivity
         return true;
     }
 
-    public void setContentText(String s)
-    {
-        textContent.setText(s);
-    }
-
     ///Kod Michała
     private void prepareListData() {
 
@@ -262,29 +315,52 @@ public class MainSelection extends AppCompatActivity
 
     private void prepareConnection()
     {
-        connection = new Connection(sharedPrefs.getString("pref_key_connection_address","192.168.2.103"), Integer.parseInt(sharedPrefs.getString("pref_key_connection_port", "9999")), textContent);
-        connection.execute();
+        if(!connected)
+        {
+            connection = new Connection(sharedPrefs.getString("pref_key_connection_address","192.168.2.103"), Integer.parseInt(sharedPrefs.getString("pref_key_connection_port", "9999")));
+            connection.execute();
+        }
     }
 
     //wątek z socketem
-    class ClientThread implements Runnable
+    class Monitor implements Runnable
     {
         public void run()
         {
-            //TODO odczyt IP z ustawien
-            String hostname = "192.168.2.106";
-            try {
-                InetAddress address = InetAddress.getByName(hostname);
-                socket = new Socket(address, 6668);
-            }
-            catch (UnknownHostException e)
+            //while(run)
+            //{
+                String[] response = connection.getRecieveMessage().split("%");
+            if(response.length == 2)
             {
-                e.printStackTrace();
+                currentOid = response[0];
+                textContent.setText(response[1]);
             }
-            catch (IOException e)
+            else
             {
-                e.printStackTrace();
+                if(response.length == 1)
+                {
+                    currentOid = response[0];
+                }
+                textContent.setText("");
             }
+            String tempName = "o" + currentOid.substring(0, currentOid.length() - 2);
+            Log.i("TEMP OID: ", tempName);
+            if(currentOid.contains("1.3.6.1.2.1.2.2"))
+                textTitle.setText(getResources().getString(getResources().getIdentifier("o1.3.6.1.2.1.2.2","string",getPackageName())));
+            else
+            try{
+                textTitle.setText(getResources().getString(getResources().getIdentifier(tempName,"string",getPackageName())));
+            }catch (Exception e)
+            {
+                Log.i("", "Resource not found");
+            }
+
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+           // }
         }
     }
 }
