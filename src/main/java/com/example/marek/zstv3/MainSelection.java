@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -51,6 +52,7 @@ public class MainSelection extends AppCompatActivity
     private int currentIndex;
     private SharedPreferences sharedPrefs;
     private Socket socket;
+    public Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,7 @@ public class MainSelection extends AppCompatActivity
         expandableList = (ExpandableListView) findViewById(R.id.expandableList);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+        prepareConnection();
         prepareListData();
         ListAdapter mAdapter = new ListAdapter(this, listFolders, listChild);
         expandableList.setAdapter(mAdapter);
@@ -86,28 +89,18 @@ public class MainSelection extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "GetNext on: " + currentName, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                StringCreator sc = new StringCreator();
+                if(currentOid == null)
+                    currentOid = "1.3.6.1.2.1.1.1";
+                connection.sendMessage(sc.createQuerry("GETNEXT", currentOid, sharedPrefs));
                 try {
-//                    EditText et = (EditText) findViewById(R.id.EditText01);
-//                    String str = et.getText().toString();
-//                    PrintWriter out = new PrintWriter(new BufferedWriter(
-//                    new OutputStreamWriter(socket.getOutputStream())),
-//                    true);
-
-                    new Thread(new ClientThread()).start();
-                    RequestModel request = new RequestModel(Header.SYSTEM, "127.0.0.1", "community_read", SystemField.UP_TIME, TableType.TCP_CONN);
-                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                    out.flush();
-                    out.writeObject(request);
-                    out.close();
-                    socket.close();
-
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //String[] response = connection.getRecieveMessage().split("/");
+                //currentOid = response[0];
+                textContent.setText(connection.getRecieveMessage());
 
             }
         });
@@ -131,41 +124,23 @@ public class MainSelection extends AppCompatActivity
                 //monitoringStop();
                 String name = listChild.get(listFolders.get(groupPosition)).get(childPosition);
                 String oid = getResources().getString(getResources().getIdentifier(name,"string",getPackageName()));
+                currentOid = oid;
 
-                /*
-                * Próba zrobienia selection na Expandable list
-                * */
-                //parent.childsetBackgroundResource(android.R.color.transparent);
-                //currentIndex = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
-//                for(int i = 0; i < parent.getCount(); i++)
-//                parent.getChildAt(i).setBackgroundResource(android.R.color.transparent);
-//                parent.getChildAt(parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition))).setBackgroundResource(R.color.colorAccent);
+                StringCreator sc = new StringCreator();
+                connection.sendMessage(sc.createQuerry("GET", currentOid, sharedPrefs));
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //String[] response = connection.getRecieveMessage().split("/");
+//                if(!(currentOid + ".0").equals(response[0]))
+//                {
+//                    currentOid = response[0];
+//                    textTitle.setText(currentOid);
+//                }
 
-                /*
-                * AsyncTask do wysyłania do serwera
-                * */
-//                new AsyncTask<Void,Void,Void>(){
-//
-//                    @Override
-//                    protected Void doInBackground(Void... params) {
-//                        String modifiedSentence;
-//                        try {
-//                            BufferedReader inFromUser = new BufferedReader( new InputStreamReader(System.in));
-//                            Socket clientSocket = new Socket(sharedPrefs.getString("pref_key_connection_address", "1.1.1.1"), Integer.parseInt(sharedPrefs.getString("pref_key_connection_port", "9999")));
-//                            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-//                            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//                            String sentence = "connection with android successful";
-//                            outToServer.writeBytes(sentence + '\n');
-//                            modifiedSentence = inFromServer.readLine();
-//                            clientSocket.close();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        return null;
-//                    }
-//
-//                }.execute();
+                textContent.setText(connection.getRecieveMessage());
 
                 currentName = name;
                 currentOid = oid;
@@ -185,6 +160,19 @@ public class MainSelection extends AppCompatActivity
         });
 
 
+    }
+
+    @SuppressWarnings("unchecked")
+
+    protected void onProgressUpdate(String item) {
+        setContentText(item);
+    }
+
+
+    protected void onPostExecute(Void unused) {
+        Toast
+                .makeText(MainSelection.this, "Done!", Toast.LENGTH_SHORT)
+                .show();
     }
 
     @Override
@@ -232,8 +220,14 @@ public class MainSelection extends AppCompatActivity
         return true;
     }
 
+    public void setContentText(String s)
+    {
+        textContent.setText(s);
+    }
+
     ///Kod Michała
     private void prepareListData() {
+
         listFolders = new ArrayList<>();
         listChild = new HashMap<>();
 
@@ -266,13 +260,19 @@ public class MainSelection extends AppCompatActivity
         listChild.put(listFolders.get(7), host);
     }
 
+    private void prepareConnection()
+    {
+        connection = new Connection(sharedPrefs.getString("pref_key_connection_address","192.168.2.103"), Integer.parseInt(sharedPrefs.getString("pref_key_connection_port", "9999")), textContent);
+        connection.execute();
+    }
+
     //wątek z socketem
     class ClientThread implements Runnable
     {
         public void run()
         {
             //TODO odczyt IP z ustawien
-            String hostname = "192.168.0.20";
+            String hostname = "192.168.2.106";
             try {
                 InetAddress address = InetAddress.getByName(hostname);
                 socket = new Socket(address, 6668);
